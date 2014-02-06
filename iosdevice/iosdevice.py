@@ -2,6 +2,7 @@ from corelibs import _get_net_size_for_tuple, _get_cidr
 from interface import NetworkInterface
 from secondaryaddress import SecondaryAddress
 from ciscoconfparse import CiscoConfParse
+from ipaddress import IPv4Address
 
 class IOSDevice:
     """

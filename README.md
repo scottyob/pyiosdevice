@@ -7,7 +7,7 @@ Requirements
 ------------
 - Python 2.7.  Untested on anything else
 - Cisco Conf Parse (http://www.pennington.net/py/ciscoconfparse/tutorial.html)
-
+- ipaddress library
 
 Library usage
 -------------

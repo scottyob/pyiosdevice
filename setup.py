@@ -1,6 +1,6 @@
 from setuptools import setup
 
-requirements = ['ciscoconfparse']
+requirements = ['ciscoconfparse', 'ipaddress']
 
 classifiers = ['Intended Audience :: Developers',
                'Intended Audience :: System Administrators',
