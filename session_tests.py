@@ -25,7 +25,11 @@ class TestClasses(SessionTests):
     def test_loading(self):
         for file in os.listdir(self.DATA_DIR):
             print file
-            IOSDevice(self.DATA_DIR + file)
+            dev = IOSDevice(self.DATA_DIR + file)
+            for interface in dev.interfaces:
+                for secondary_address in interface.secondary:
+                   print secondary_address.network
+                print interface.network
             
 if __name__ == '__main__':
     unittest.main()

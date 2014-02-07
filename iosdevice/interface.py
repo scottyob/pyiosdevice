@@ -1,4 +1,5 @@
 from corelibs import _get_net_size_for_tuple, _get_cidr
+from ipaddress import IPv4Network
 
 class NetworkInterface:
     """
@@ -28,7 +29,14 @@ class NetworkInterface:
 
     @property
     def cidr(self):
-        return "%s/%s" % (self.address, _get_cidr(self.netmask) )
+        return unicode("%s/%s") % (self.address, _get_cidr(self.netmask) )
+
+    @property
+    def network(self):
+        """
+        Returns an IPv4Network object for this network interface
+        """
+        return IPv4Network(self.cidr, strict=False)
 
     def getRecommendedDnsEntry(self, append_domain_name=""):
         """
