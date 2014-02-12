@@ -6,7 +6,7 @@ class NetworkInterface:
     Represents a network interface
     """
 
-    def __init__(self, parent_device, name=None, address=None, netmask=None, vrf=None, secondary=[]):
+    def __init__(self, parent_device, name=None, address=None, netmask=None, vrf=None, secondary=None, description=None):
         """
         Create a new NetworkInterface
 
@@ -18,14 +18,17 @@ class NetworkInterface:
         :type secondary: list
         :type parent_device: IOSDevice
         """
-
         
         self.name = name
         self.address = address
         self.netmask = netmask
         self.vrf = vrf
-        self.secondary = secondary
+        if secondary:
+            self.secondary = secondary
+        else:
+            self.secondary = []
         self.parent_device = parent_device
+        self.description = description
 
     @property
     def cidr(self):
@@ -47,13 +50,13 @@ class NetworkInterface:
         """
         to_return = None
         if self.address == self.parent_device.router_id:
-            to_return = self.parent_device.hostname + append_domain_name
+            to_return = self.parent_device.hostname
         else:
             to_return = "%s-%s" % (self.parent_device.hostname, self.name.replace("/", "_").replace(".", "_") )
-            if self.vrf != 'GLOBAL':
+            if self.vrf:
                 to_return += "-%s" % self.vrf
 
-        return to_return
+        return unicode(to_return.lower()) + append_domain_name
 
     def __unicode__(self):
         return u'%s %s' % (self.address, self.netmask)

@@ -7,6 +7,8 @@ from ipaddress import IPv4Address
 class IOSDevice:
     """
     Represents an IOS Device.  Some helper functions here to assist with common stuff
+
+    :type hostname: str
     """
 
     def __init__(self, config_filename):
@@ -28,6 +30,11 @@ class IOSDevice:
         router_ids = self.parsed_switch_config.find_lines('router-id')
         if len(router_ids) > 0:
             router_id = self.parsed_switch_config.find_lines('router-id')[0].split()[-1] #Assume all mgmt addresses are the same
+        elif len(self.parsed_switch_config.find_lines('^logging source-interface')) > 0:
+            #Little hack.  We don't have a router-id so lets use the logging source-id as the switch identifier
+            for interface in self.getNetworkInterfaces():
+                if interface.name == self.parsed_switch_config.find_lines('^logging source-interface')[0].split()[-1]:
+                    return interface.address
         else:
             #There is no explicit mgmt address.
             # The router-id is set by the highest IP Address of a manually created loopback address
@@ -69,7 +76,11 @@ class IOSDevice:
             interface_name = interface.split()[1]
             
             #VRF is in global by default
-            vrf = 'GLOBAL'
+            vrf = None
+
+            description = None
+            if interface_config.find_lines('description'):
+                description = " ".join(interface_config.find_lines('description')[0].strip().split()[1:])
             
             if interface_config.find_lines('^ ip vrf forwarding'):
                 vrf = interface_config.find_lines('^ ip vrf forwarding')[0].strip().split()[-1]
@@ -103,11 +114,11 @@ class IOSDevice:
                         if len(interface_config.find_lines('channel-group')) > 0:
                             should_add_address = False
                             break
-    
                         interface.address = address.strip().split('ip address')[1].split()[0]
                         interface.name = interface_name
                         interface.netmask = address.strip().split('ip address')[1].split()[1]
                         interface.vrf = vrf
+                        interface.description = description
                         to_return.append(interface)
         return to_return
 
@@ -121,3 +132,18 @@ class IOSDevice:
         if self.interfaces is None:
             self.interfaces = self._getNetworkInterfaces()
         return self.interfaces
+
+    def getHostname(self):
+        """
+        Returns the hostname on this device
+        :rtype: str
+        """
+        return self.hostname
+
+    def getParsedSwitchConfig(self):
+        """
+        Returns a parsed switch config object (CiscoConfParse) for this device
+
+        :rtype: CiscoConfParse
+        """
+        return self.parsed_switch_config()
