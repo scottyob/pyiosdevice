@@ -102,7 +102,7 @@ class IOSDevice:
                 for address in interface_config.find_lines('^ ip address'):
                     #We can have multiple addresses here, have to allow for secondaries
                     if "secondary" in address:
-                        secondary_address = SecondaryAddress()
+                        secondary_address = SecondaryAddress(interface)
                         secondary_address.address = address.strip().split('ip address')[1].split()[0]
                         secondary_address.netmask = address.strip().split('ip address')[1].split()[1]
                         interface.secondary.append(secondary_address)
